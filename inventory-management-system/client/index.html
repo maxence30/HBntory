@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>HBntory AI Assistant</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+
+        h1 {
+            text-align: center;
+        }
+
+
+        .container {
+            display: flex;
+            gap: 10px;
+        }
+
+
+        input {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+        }
+
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+
+        #response {
+
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+
+            min-height: 50px;
+        }
+
+
+        .examples {
+
+            margin-top: 30px;
+        }
+
+
+        .examples button {
+
+            margin: 5px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<h1>
+    HBntory AI Assistant
+</h1>
+
+
+<p>
+    Ask questions about products and stock.
+</p>
+
+
+
+<div class="container">
+
+
+    <input
+        id="question"
+        type="text"
+        placeholder="Example: How many products are in stock?"
+    >
+
+
+    <button onclick="askQuestion()">
+        Send
+    </button>
+
+
+</div>
+
+
+
+<div id="response">
+
+    Response will appear here...
+
+</div>
+
+
+
+<div class="examples">
+
+    <h3>
+        Example questions:
+    </h3>
+
+
+    <button onclick="setQuestion('Combien avons-nous de produits en stock ?')">
+        Total stock
+    </button>
+
+
+    <button onclick="setQuestion('Donne-moi le stock du produit 1')">
+        Product 1 stock
+    </button>
+
+
+    <button onclick="setQuestion('Quel est le stock de la branche 1 ?')">
+        Branch 1 stock
+    </button>
+
+
+</div>
+
+
+
+<script>
+
+
+function setQuestion(text) {
+
+    document.getElementById("question").value = text;
+
+}
+
+
+
+async function askQuestion() {
+
+
+    const input =
+        document.getElementById("question");
+
+
+    const responseBox =
+        document.getElementById("response");
+
+
+    const question = input.value;
+
+
+
+    if (!question) {
+
+        responseBox.innerHTML =
+            "Please enter a question.";
+
+        return;
+
+    }
+
+
+
+    responseBox.innerHTML =
+        "Loading...";
+
+
+
+    try {
+
+
+        const response = await fetch(
+            "http://127.0.0.1:7000/query",
+            {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type": "application/json"
+
+                },
+
+
+                body: JSON.stringify({
+
+                    question: question
+
+                })
+
+            }
+
+        );
+
+
+
+        const data =
+            await response.json();
+
+
+
+        if (!response.ok) {
+
+
+            responseBox.innerHTML =
+                "Error: " + data.error;
+
+
+            return;
+
+        }
+
+
+
+        responseBox.innerHTML =
+            data.answer;
+
+
+
+    }
+
+
+    catch(error) {
+
+
+        responseBox.innerHTML =
+            "Error: AI Query Service unavailable.";
+
+
+    }
+
+
+
+}
+
+
+</script>
+
+
+
+</body>
+
+</html>
