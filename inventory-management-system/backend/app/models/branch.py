@@ -7,8 +7,15 @@ from app.database import Base
 class Branch(Base):
     __tablename__ = "branches"
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    id = Column(
+        Integer,
+        primary_key=True
+    )
+
+    name = Column(
+        String,
+        nullable=False
+    )
 
     users = relationship(
         "User",

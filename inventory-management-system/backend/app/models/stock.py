@@ -1,8 +1,10 @@
-from sqlalchemy import CheckConstraint
+from sqlalchemy import Column, Integer, ForeignKey, CheckConstraint
+from sqlalchemy.orm import relationship
+
+from app.database import Base
 
 
 class Stock(Base):
-
     __tablename__ = "stocks"
 
     __table_args__ = (
