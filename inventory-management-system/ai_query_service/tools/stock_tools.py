@@ -1,7 +1,33 @@
 import sqlite3
 
-
 DATABASE = "../backend/inventory.db"
+
+
+def get_total_stock():
+    """
+    Return total quantity of all products in stock.
+    """
+
+    connection = sqlite3.connect(DATABASE)
+
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT SUM(quantity)
+        FROM stocks
+        """
+    )
+
+    result = cursor.fetchone()
+
+    connection.close()
+
+    total = result[0] if result[0] else 0
+
+    return {
+        "total_stock": total
+    }
 
 
 def get_product_stock(product_id: int):

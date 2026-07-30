@@ -1,12 +1,16 @@
-from sqlalchemy import Column, Integer, ForeignKey
-
-from sqlalchemy.orm import relationship
-
-from app.database import Base
+from sqlalchemy import CheckConstraint
 
 
 class Stock(Base):
+
     __tablename__ = "stocks"
+
+    __table_args__ = (
+        CheckConstraint(
+            "quantity >= 0",
+            name="stock_quantity_non_negative"
+        ),
+    )
 
     id = Column(
         Integer,

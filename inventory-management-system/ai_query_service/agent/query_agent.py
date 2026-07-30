@@ -1,58 +1,66 @@
-from tools.stock_tools import get_product_stock
-from tools.product_tools import get_product_tools
+from google.adk.agents import Agent
+
+from tools.stock_tools import (
+    get_total_stock,
+    get_product_stock,
+    get_branch_stock
+)
 
 
-async def answer_product_location(product_id: int):
-    """
-    Return where a product is available using MCP tools.
-    """
+root_agent = Agent(
+    name="hbntory_agent",
 
-    tools = await get_product_tools()
+    model="ollama/qwen2.5:3b",
 
-    available_tools = [
-        tool.name
-        for tool in tools.tools
+    instruction="""
+You are HBntory inventory assistant.
+
+You have exactly 3 tools.
+
+Available tools:
+
+1. get_total_stock
+Use this ONLY when the user asks the total quantity of products.
+
+2. get_product_stock
+Use this ONLY when the user asks the stock of a specific product.
+
+3. get_branch_stock
+Use this ONLY when the user asks the stock of a specific branch.
+
+IMPORTANT:
+- The tool names are exact.
+- Never call total_stock.
+- Never call product_stock.
+- Never invent another function.
+- Always use the exact names above.
+
+Examples:
+
+User:
+"Combien avons-nous de produits en stock ?"
+
+Call:
+get_total_stock
+
+User:
+"Stock du produit 1"
+
+Call:
+get_product_stock(product_id=1)
+
+User:
+"Stock de la branche 1"
+
+Call:
+get_branch_stock(branch_id=1)
+
+After using a tool, answer normally in French.
+""",
+
+    tools=[
+        get_total_stock,
+        get_product_stock,
+        get_branch_stock
     ]
-
-    if "get_product" not in available_tools:
-        return {
-            "error": "Product MCP tool unavailable"
-        }
-
-    stock = get_product_stock(product_id)
-
-    if not stock:
-        return {
-            "message": "No stock available"
-        }
-
-    return {
-        "product_id": product_id,
-        "available_at": stock
-    }
-
-
-async def generate_answer(product_id: int):
-    """
-    Generate a user-friendly answer from product availability data.
-    """
-
-    result = await answer_product_location(product_id)
-
-    if "error" in result:
-        return result["error"]
-
-    if "message" in result:
-        return result["message"]
-
-    locations = []
-
-    for item in result["available_at"]:
-        locations.append(
-            f"{item['branch']} ({item['quantity']} units)"
-        )
-
-    return (
-        f"Product {product_id} is available at: "
-        + ", ".join(locations)
-    )
+)
